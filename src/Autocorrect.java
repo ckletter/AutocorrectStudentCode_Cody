@@ -17,6 +17,30 @@ import static org.junit.jupiter.params.shadow.com.univocity.parsers.common.Norma
 public class Autocorrect {
     private int threshold;
     private String[] words;
+    public class Word implements Comparable<Word> {
+        private int editDistance;
+        private String word;
+        public Word(int editDistance, String word) {
+            this.editDistance = editDistance;
+            this.word = word;
+        }
+
+        public int getEditDistance() {
+            return editDistance;
+        }
+
+        public String getWord() {
+            return word;
+        }
+
+        @Override
+        public int compareTo(Word other) {
+            if (this.editDistance != other.editDistance) {
+                return Integer.compare(this.editDistance, other.editDistance);
+            }
+            return this.word.compareTo(other.word);
+        }
+    }
     /**
      * Constucts an instance of the Autocorrect class.
      * @param words The dictionary of acceptable words.
@@ -25,6 +49,7 @@ public class Autocorrect {
     public Autocorrect(String[] words, int threshold) {
         this.threshold = threshold;
         this.words = words;
+
     }
 
     /**
@@ -34,15 +59,20 @@ public class Autocorrect {
      * to threshold, sorted by edit distance, then sorted alphabetically.
      */
     public String[] runTest(String typed) {
-        ArrayList<String> similar = new ArrayList<String>();
+        ArrayList<Word> similar = new ArrayList<Word>();
         for (String word : words) {
-            if (editDistance(word, typed) <= threshold) {
-                similar.add(word);
+            int editDistance = editDistance(word, typed);
+            if (editDistance <= threshold) {
+                Word thisWord = new Word(editDistance, word);
+                similar.add(thisWord);
             }
         }
-        String[] words = new String[similar.size()];
-        words = similar.toArray(new String[0]);
-        return words;
+        similar.sort(null);
+        String[] similarArray = new String[similar.size()];
+        for (int i = 0; i < similar.size(); i++) {
+            similarArray[i] = similar.get(i).getWord();
+        }
+        return similarArray;
     }
     public int editDistance(String typed, String dict) {
         int[][] lev = new int[typed.length() + 1][dict.length() + 1];
@@ -65,6 +95,13 @@ public class Autocorrect {
             }
         }
         return lev[typed.length()][dict.length()];
+    }
+    public String[] getTokens(String word, int grams) {
+        String[] tokens = new String[word.length() - grams + 1];
+        for (int i = 0; i <= word.length() - grams; i++) {
+            tokens[i] = word.substring(i, i + grams);
+        }
+        return tokens;
     }
 
     /**
