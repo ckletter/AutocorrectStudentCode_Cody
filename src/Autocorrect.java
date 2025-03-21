@@ -49,7 +49,6 @@ public class Autocorrect {
     public Autocorrect(String[] words, int threshold) {
         this.threshold = threshold;
         this.words = words;
-
     }
 
     /**
@@ -59,20 +58,27 @@ public class Autocorrect {
      * to threshold, sorted by edit distance, then sorted alphabetically.
      */
     public String[] runTest(String typed) {
-        ArrayList<Word> similar = new ArrayList<Word>();
+        Trie trieDict = new Trie(threshold);
         for (String word : words) {
-            int editDistance = editDistance(word, typed);
-            if (editDistance <= threshold) {
-                Word thisWord = new Word(editDistance, word);
-                similar.add(thisWord);
-            }
+            trieDict.insert(word);
         }
-        similar.sort(null);
-        String[] similarArray = new String[similar.size()];
-        for (int i = 0; i < similar.size(); i++) {
-            similarArray[i] = similar.get(i).getWord();
-        }
-        return similarArray;
+        trieDict.findCandidates(typed);
+
+
+        //        ArrayList<Word> similar = new ArrayList<Word>();
+//        for (String word : words) {
+//            int editDistance = editDistance(word, typed);
+//            if (editDistance <= threshold) {
+//                Word thisWord = new Word(editDistance, word);
+//                similar.add(thisWord);
+//            }
+//        }
+//        similar.sort(null);
+//        String[] similarArray = new String[similar.size()];
+//        for (int i = 0; i < similar.size(); i++) {
+//            similarArray[i] = similar.get(i).getWord();
+//        }
+//        return similarArray;
     }
     public int editDistance(String typed, String dict) {
         int[][] lev = new int[typed.length() + 1][dict.length() + 1];
@@ -96,13 +102,14 @@ public class Autocorrect {
         }
         return lev[typed.length()][dict.length()];
     }
-    public String[] getTokens(String word, int grams) {
-        String[] tokens = new String[word.length() - grams + 1];
-        for (int i = 0; i <= word.length() - grams; i++) {
-            tokens[i] = word.substring(i, i + grams);
-        }
-        return tokens;
-    }
+//    public String[] getTokens(String word, int grams) {
+//        String[] tokens = new String[word.length() - grams + 1];
+//        for (int i = 0; i <= word.length() - grams; i++) {
+//            tokens[i] = word.substring(i, i + grams);
+//        }
+//        return tokens;
+//    }
+
 
     /**
      * Loads a dictionary of words from the provided textfiles in the dictionaries directory.
