@@ -9,6 +9,7 @@ Name: Cody
 | Mar 18   | 10:55-11:55 | I spent this time talking with Mr. Blick about both an approach with tokenization and an approach with a Trie using DFS and pruning with edit distance. For the last 10 minutes of class, I began coding the TST to store all the words in my dictionary. |
 | Mar 20   |  8:55-9:55  |       I spent this time implementing the trie that I discussed with Mr. Blick in class to calculate lev. distance while following DFS. I thought about using the same method with different parameters to replicate addition, substitution, and deletion. |
 | Mar 21   |  2:00-3:00  |                                                                                                                           I spent this time continuing to write my DFS method after speaking with Mr. Blick. I decided to focus on which "state" I am in. |
+| Mar 25   |  8:15-8:45  |                                                                I spent this time adding a letter map and fixing some bugs, and revising my depth first search method. I decided I needed one more path to follow for when there has been no "edits" made. |
 
 
 To add a new row to the table, click into a cell and then hit shift-enter.

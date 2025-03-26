@@ -65,20 +65,20 @@ public class Autocorrect {
         trieDict.findCandidates(typed);
 
 
-        //        ArrayList<Word> similar = new ArrayList<Word>();
-//        for (String word : words) {
-//            int editDistance = editDistance(word, typed);
-//            if (editDistance <= threshold) {
-//                Word thisWord = new Word(editDistance, word);
-//                similar.add(thisWord);
-//            }
-//        }
-//        similar.sort(null);
-//        String[] similarArray = new String[similar.size()];
-//        for (int i = 0; i < similar.size(); i++) {
-//            similarArray[i] = similar.get(i).getWord();
-//        }
-//        return similarArray;
+                ArrayList<Word> similar = new ArrayList<Word>();
+        for (String word : words) {
+            int editDistance = editDistance(word, typed);
+            if (editDistance <= threshold) {
+                Word thisWord = new Word(editDistance, word);
+                similar.add(thisWord);
+            }
+        }
+        similar.sort(null);
+        String[] similarArray = new String[similar.size()];
+        for (int i = 0; i < similar.size(); i++) {
+            similarArray[i] = similar.get(i).getWord();
+        }
+        return similarArray;
     }
     public int editDistance(String typed, String dict) {
         int[][] lev = new int[typed.length() + 1][dict.length() + 1];

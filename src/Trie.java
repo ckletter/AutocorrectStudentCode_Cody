@@ -3,12 +3,20 @@ import java.util.LinkedList;
 import java.util.Stack;
 
 public class Trie {
-    public static final int RADIX = 26;
+    public static final int RADIX = 27;
     private final Prefix root;
     private int threshold;
+    private int[] letterMap;
     public Trie(int threshold) {
         root = new Prefix();
         this.threshold = threshold;
+        this.letterMap = new int[RADIX];
+        // Fill letter map with letters in alphabet
+        for (int i = 0; i < RADIX - 1; i++) {
+            this.letterMap[i] = i + 'a';
+        }
+        // Set the last index of the trie equal to the ' ascii
+        this.letterMap[RADIX - 1] = 39;
     }
     private class Prefix {
         private boolean isWord;
@@ -51,21 +59,25 @@ public class Trie {
         currentPrefix.setWord();
     }
 
-    public void editDistDFS(Prefix currentPrefix, String word, String currentString, int index, ArrayList<String> possibleWords, int thresholdDist) {
-        if (thresholdDist == 0) {
+    public void editDistDFS(Prefix currentPrefix, String word, String currentString, int index, ArrayList<String> possibleWords, int edits) {
+        if (edits == threshold) {
             return;
         }
-        // Follow rest of word
-        followRestOfWord(currentPrefix, word, currentString, index, possibleWords);
+        // Follow rest of word and add relevant existing words within threshold
+        if (edits != 0) {
+            followRestOfWord(currentPrefix, word, currentString, index, possibleWords);
+        }
         for (int j = 0; j < RADIX; j++) {
             Prefix currentChild = currentPrefix.getChildren()[j];
             // Addition
-            editDistDFS(currentChild, word, currentString + (j + 'a'), index, possibleWords, thresholdDist - 1);
+            editDistDFS(currentChild, word, currentString + letterMap[j], index, possibleWords, edits + 1);
             // Deletion
-            editDistDFS(currentChild, word, currentString + (j + 'a'), index + 1, possibleWords, thresholdDist - 1);
+            editDistDFS(currentChild, word, currentString, index + 1, possibleWords, edits + 1);
             // Substitution
-            editDistDFS(currentPrefix, word, currentString + (j + 'a'), index - 1, possibleWords, thresholdDist - 1);
+            editDistDFS(currentPrefix, word, currentString + letterMap[j], index - 1, possibleWords, edits + 1);
         }
+        // Case where nothing is changed, follows the word down
+        editDistDFS(currentPrefix, word, currentString + word.charAt(index), index + 1, possibleWords, edits);
     }
     public void followRestOfWord(Prefix current, String word, String currentString, int index, ArrayList<String> possibleWords) {
         StringBuilder currentStringBuilder = new StringBuilder(currentString);
