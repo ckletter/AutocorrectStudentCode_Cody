@@ -1,24 +1,23 @@
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.Stack;
 
 public class Trie {
     public static final int RADIX = 27;
     private final Prefix root;
     private int threshold;
-    private int[] letterMap;
+    private char[] letterMap;
     private int[] toIndexMap;
     public Trie(int threshold) {
         root = new Prefix();
         this.threshold = threshold;
-        this.letterMap = new int[RADIX];
+        this.letterMap = new char[RADIX];
         this.toIndexMap = new int[256];
         // Fill letter map with letters in alphabet
         for (int i = 0; i < RADIX - 1; i++) {
-            this.letterMap[i] = i + 'a';
+            this.letterMap[i] = (char) (i + 'a');
         }
         // Set the last index of the trie equal to the ' ascii
-        this.letterMap[RADIX - 1] = 39;
+        this.letterMap[RADIX - 1] = (char) 39;
         // Fill to index map with letters in alphabet
         for (int i = 0; i < RADIX - 1; i++) {
             this.toIndexMap[i + 'a'] = i;
@@ -67,7 +66,7 @@ public class Trie {
         currentPrefix.setWord();
     }
 
-    public void editDistDFS(Prefix currentPrefix, String word, String currentString, int index, ArrayList<String> possibleWords, int edits) {
+    public void editDistDFS(Prefix currentPrefix, String word, String currentString, int index, ArrayList<Autocorrect.Word> possibleWords, int edits) {
         // If more edits made than threshold, prune branch
         if (edits > threshold) {
             return;
@@ -76,19 +75,33 @@ public class Trie {
         if (currentPrefix == null) {
             return;
         }
-        // If valid word, add to our possible words
-        if (index == word.length() && currentPrefix.isWord() && !currentString.equals(word)) {
-            possibleWords.add(currentString);
-        }
-        if (index < word.length()) {
-            // Case where nothing is changed, follows the word down
-            editDistDFS(currentPrefix, word, currentString + word.charAt(index), index + 1, possibleWords, edits);
-            // Try all possible substitutions
-            for (int j = 0; j < RADIX; j++) {
-                editDistDFS(currentPrefix, word, currentString + letterMap[j], index + 1, possibleWords, edits + 1);
+        // If valid word and an edit has been made, add to our possible words
+        if (index == word.length() && currentPrefix.isWord() && edits > 0) {
+            // Check if the word is already in possibleWords by comparing stored words
+            boolean alreadyExists = false;
+            for (Autocorrect.Word possibleWord : possibleWords) {
+                if (possibleWord.getWord().equals(currentString)) {
+                    alreadyExists = true;
+                    break;
+                }
+            }
+
+            // Only add if it's not already present
+            if (!alreadyExists) {
+                possibleWords.add(new Autocorrect.Word(edits, currentString));
             }
         }
-        for (int j = 0; j < RADIX; j++) {
+        // If not yet at the length of the word
+        if (index < word.length()) {
+            // Case where nothing is changed, follows the word down
+            editDistDFS(currentPrefix.getChildren()[toIndexMap[word.charAt(index)]], word, currentString + word.charAt(index), index + 1, possibleWords, edits);
+            // Try all possible substitutions
+            for (int j = 0; j < RADIX - 1; j++) {
+                Prefix currentChild = currentPrefix.getChildren()[j];
+                editDistDFS(currentChild, word, currentString+ letterMap[j], index + 1, possibleWords, edits + 1);
+            }
+        }
+        for (int j = 0; j < RADIX - 1; j++) {
             Prefix currentChild = currentPrefix.getChildren()[j];
             // Addition
             editDistDFS(currentChild, word, currentString + letterMap[j], index, possibleWords, edits + 1);
@@ -96,11 +109,7 @@ public class Trie {
         // Deletion
         editDistDFS(currentPrefix, word, currentString, index + 1, possibleWords, edits + 1);
     }
-    public void findCandidates(String word) {
-            ArrayList<String> possibleWords = new ArrayList<>();
-            editDistDFS(root, word, "", 0, possibleWords, 0);
-        }
-
-
+    public void findCandidates(String word, ArrayList<Autocorrect.Word> possibleWords) {
+        editDistDFS(root, word, "", 0, possibleWords, 0);
     }
 }

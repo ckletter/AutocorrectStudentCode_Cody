@@ -11,6 +11,7 @@ Name: Cody
 | Mar 21   |  2:00-3:00  |                                                                                                                                                                                                        I spent this time continuing to write my DFS method after speaking with Mr. Blick. I decided to focus on which "state" I am in. |
 | Mar 25   |  8:15-8:45  |                                                                                                                                             I spent this time adding a letter map and fixing some bugs, and revising my depth first search method. I decided I needed one more path to follow for when there has been no "edits" made. |
 | Mar 25   |  8:45-9:15  | Continued making modifications in DFS including removing my follow rest of word method (I decided that method was already handled by the different states of DFS), and therefore creating another base case for if the current word exists or not. I still am running into errors with substitution and lining up my indices correctly |
+| Mar 27   | 9:30-10:15  |                                                                   Huge progress! I changed my array list from adding strings to adding word objects so that I can also sort by edit distance. I am now noticing that it is finding the correct number of words! But the edit distance is off... I am now working on fixing this error. |
 
 
 To add a new row to the table, click into a cell and then hit shift-enter.

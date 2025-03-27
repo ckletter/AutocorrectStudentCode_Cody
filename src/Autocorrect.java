@@ -17,7 +17,7 @@ import static org.junit.jupiter.params.shadow.com.univocity.parsers.common.Norma
 public class Autocorrect {
     private int threshold;
     private String[] words;
-    public class Word implements Comparable<Word> {
+    public static class Word implements Comparable<Word> {
         private int editDistance;
         private String word;
         public Word(int editDistance, String word) {
@@ -59,26 +59,39 @@ public class Autocorrect {
      */
     public String[] runTest(String typed) {
         Trie trieDict = new Trie(threshold);
+        // Add each word in the dictionary to the trie
         for (String word : words) {
             trieDict.insert(word);
         }
-        trieDict.findCandidates(typed);
-
-
-                ArrayList<Word> similar = new ArrayList<Word>();
-        for (String word : words) {
-            int editDistance = editDistance(word, typed);
-            if (editDistance <= threshold) {
-                Word thisWord = new Word(editDistance, word);
-                similar.add(thisWord);
-            }
-        }
-        similar.sort(null);
-        String[] similarArray = new String[similar.size()];
-        for (int i = 0; i < similar.size(); i++) {
-            similarArray[i] = similar.get(i).getWord();
+        ArrayList<Word> possibleWords = new ArrayList<Word>();
+        // Find all candidate words within threshold distance away
+        trieDict.findCandidates(typed, possibleWords);
+        // Sort, first by threshold, then alphabetical
+        possibleWords.sort(null);
+        String[] similarArray = new String[possibleWords.size()];
+        for (int i = 0; i < possibleWords.size(); i++) {
+            similarArray[i] = possibleWords.get(i).getWord();
+            System.out.println(possibleWords.get(i).getWord());
+            System.out.println(possibleWords.get(i).getEditDistance());
         }
         return similarArray;
+//        return possibleWords.toArray(new Word[0]);
+
+        // Calculate levenshtein distance
+//        ArrayList<Word> similar = new ArrayList<Word>();
+//        for (String word : words) {
+//            int editDistance = editDistance(word, typed);
+//            if (editDistance <= threshold) {
+//                Word thisWord = new Word(editDistance, word);
+//                similar.add(thisWord);
+//            }
+//        }
+//        similar.sort(null);
+//        String[] similarArray = new String[similar.size()];
+//        for (int i = 0; i < similar.size(); i++) {
+//            similarArray[i] = similar.get(i).getWord();
+//        }
+//        return similarArray;
     }
     public int editDistance(String typed, String dict) {
         int[][] lev = new int[typed.length() + 1][dict.length() + 1];
