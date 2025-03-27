@@ -78,16 +78,23 @@ public class Trie {
         // If valid word and an edit has been made, add to our possible words
         if (index == word.length() && currentPrefix.isWord() && edits > 0) {
             // Check if the word is already in possibleWords by comparing stored words
-            boolean alreadyExists = false;
-            for (Autocorrect.Word possibleWord : possibleWords) {
+            boolean validWord = true;
+            for (int i = 0; i < possibleWords.size(); i++) {
+                Autocorrect.Word possibleWord = possibleWords.get(i);
                 if (possibleWord.getWord().equals(currentString)) {
-                    alreadyExists = true;
+                    // If edit distance is less, replace the word
+                    if (edits < possibleWord.getEditDistance()) {
+                        possibleWords.remove(i);
+                        possibleWords.add(i, new Autocorrect.Word(edits, currentString));
+                        validWord = false;
+                    }
+                    validWord = false;
                     break;
                 }
             }
 
             // Only add if it's not already present
-            if (!alreadyExists) {
+            if (validWord) {
                 possibleWords.add(new Autocorrect.Word(edits, currentString));
             }
         }
@@ -96,12 +103,12 @@ public class Trie {
             // Case where nothing is changed, follows the word down
             editDistDFS(currentPrefix.getChildren()[toIndexMap[word.charAt(index)]], word, currentString + word.charAt(index), index + 1, possibleWords, edits);
             // Try all possible substitutions
-            for (int j = 0; j < RADIX - 1; j++) {
+            for (int j = 0; j < RADIX; j++) {
                 Prefix currentChild = currentPrefix.getChildren()[j];
                 editDistDFS(currentChild, word, currentString+ letterMap[j], index + 1, possibleWords, edits + 1);
             }
         }
-        for (int j = 0; j < RADIX - 1; j++) {
+        for (int j = 0; j < RADIX; j++) {
             Prefix currentChild = currentPrefix.getChildren()[j];
             // Addition
             editDistDFS(currentChild, word, currentString + letterMap[j], index, possibleWords, edits + 1);
