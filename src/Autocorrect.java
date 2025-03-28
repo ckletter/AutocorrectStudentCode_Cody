@@ -3,6 +3,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Scanner;
 
 import static org.junit.jupiter.params.shadow.com.univocity.parsers.common.NormalizedString.toArray;
 
@@ -71,8 +72,7 @@ public class Autocorrect {
         String[] similarArray = new String[possibleWords.size()];
         for (int i = 0; i < possibleWords.size(); i++) {
             similarArray[i] = possibleWords.get(i).getWord();
-            System.out.println(possibleWords.get(i).getWord());
-            System.out.println(possibleWords.get(i).getEditDistance());
+//            System.out.println(possibleWords.get(i).getWord());
         }
         return similarArray;
 //        return possibleWords.toArray(new Word[0]);
@@ -148,5 +148,36 @@ public class Autocorrect {
         catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+    public void run() {
+        Scanner s = new Scanner(System.in);
+        // Get user word
+        System.out.println("Type a word:");
+        String word = s.nextLine();
+        String[] possibleWords = runTest(word);
+        // Print out all possible matching words to inputted word, up to 3 maximum
+        if (possibleWords.length == 0) {
+            System.out.println("No matches found.");
+        }
+        else if (possibleWords.length == 1) {
+            System.out.println("Did you mean...");
+            System.out.println(possibleWords[0]);
+        }
+        else if (possibleWords.length == 2) {
+            System.out.println("Did you mean...");
+            System.out.println(possibleWords[0]);
+            System.out.println(possibleWords[1]);
+        }
+        else {
+            System.out.println("Did you mean...");
+            for (int i = 0; i < 3; i++) {
+                System.out.println(possibleWords[i]);
+            }
+        }
+    }
+    public static void main(String[] args) {
+        String[] words = loadDictionary("large");
+        Autocorrect autocorrect = new Autocorrect(words, 2);
+        autocorrect.run();
     }
 }
